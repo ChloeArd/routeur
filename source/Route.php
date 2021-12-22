@@ -2,6 +2,7 @@
 
 namespace Chloe\Routeur;
 
+use ReflectionClass;
 use ReflectionFunction;
 use ReflectionParameter;
 
@@ -32,20 +33,6 @@ class Route {
         return $this->name;
     }
 
-    /**
-     * @return string
-     */
-    public function getPath(): string {
-        return $this->path;
-    }
-
-    /**
-     * @return array|callable
-     */
-    public function getCallable() {
-        return $this->callable;
-    }
-
     // transformer le chemin en regex pour récupérer ici son id
     public function test(string $path): bool {
         $pattern = str_replace("/", "\/", $this->path);
@@ -71,7 +58,13 @@ class Route {
 
         if (count($parameters) > 0) {
             $parameters = array_combine($parameters, $matches);
-            $reflectionFunc = new ReflectionFunction($this->callable);
+            if (is_array($this->callable)) {
+                $reflectionFunc = (new ReflectionClass($this->callable[0]))->getMethod($this->callable[1]);
+
+            }
+            else {
+                $reflectionFunc = new ReflectionFunction($this->callable);
+            }
 
             $args = array_map(fn (ReflectionParameter $param) => $param->getName(), $reflectionFunc->getParameters());
 
@@ -80,6 +73,12 @@ class Route {
             },$args);
         }
 
-        return call_user_func_array($this->callable, $argsValue);
+        $callable = $this->callable;
+
+        if (is_array($callable)) {
+            $callable = [new $callable[0](), $callable[1]];
+        }
+
+        return call_user_func_array($callable, $argsValue);
     }
 }

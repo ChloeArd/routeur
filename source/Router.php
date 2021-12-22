@@ -26,6 +26,14 @@ class Router {
     }
 
     /**
+     * @param string $path
+     * @return false|mixed
+     */
+    public function call(string $path) {
+        return $this->match($path)->call($path);
+    }
+
+    /**
      * @param Route $route
      * @return $this
      * @throws RouteAlreadyExistsException

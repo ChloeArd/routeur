@@ -6,6 +6,8 @@ use Chloe\Routeur\Route;
 use Chloe\Routeur\RouteAlreadyExistsException;
 use Chloe\Routeur\RouteNotFoundException;
 use Chloe\Routeur\Router;
+use Chloe\Routeur\Tests\Fixtures\FooController;
+use Chloe\Routeur\Tests\Fixtures\HomeController;
 use PHPUnit\Framework\TestCase;
 
 class RouterTest extends TestCase {
@@ -13,18 +15,19 @@ class RouterTest extends TestCase {
     public function test() {
         $router = new Router();
 
-        $routeHome = new Route("home", "/", function() {
-            return "Hello world";
-        });
+        $routeHome = new Route("home", "/", [HomeController::class, "index"]);
+
+        $routeFoo = new Route("foo", "/foo/{bar}", [FooController::class, "bar"]);
 
         $routeArticle = new Route("article", "/blog/{id}/{slug}", function(string $slug, string $id) {
             return sprintf("%s : %s", $id, $slug);
         });
 
         $router->add($routeHome);
+        $router->add($routeFoo);
         $router->add($routeArticle);
 
-        $this->assertCount(2, $router->getRouteCollection());
+        $this->assertCount(3, $router->getRouteCollection());
 
         $this->assertContainsOnlyInstancesOf(Route::class, $router->getRouteCollection());
 
@@ -33,9 +36,11 @@ class RouterTest extends TestCase {
         $this->assertEquals($routeHome, $router->match("/"));
         $this->assertEquals($routeArticle, $router->match("/blog/12/mon-article"));
 
-        $this->assertEquals("Hello world", $router->match("/")->call("/"));
+        $this->assertEquals("Hello world", $router->call("/"));
 
-        $this->assertEquals("12 : mon-article", $router->match("/blog/12/mon-article")->call("/blog/12/mon-article"));
+        $this->assertEquals("12 : mon-article", $router->call("/blog/12/mon-article"));
+
+        $this->assertEquals("bar", $router->call("/foo/bar"));
 
     }
 
