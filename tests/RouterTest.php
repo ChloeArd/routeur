@@ -13,20 +13,38 @@ class RouterTest extends TestCase {
     public function test() {
         $router = new Router();
 
-        $route = new Route("home", "/", function() {
-            echo "Hello World";
+        $routeHome = new Route("home", "/", function() {
+            return "Hello world";
         });
 
-        $router->add($route);
-        $this->assertCount(1, $router->getRouteCollection());
+        $routeArticle = new Route("article", "/blog/{id}/{slug}", function(string $id, string $slug) {
+            return sprintf("%s : %s", $id, $slug);
+        });
+
+        $router->add($routeHome);
+        $router->add($routeArticle);
+
+        $this->assertCount(2, $router->getRouteCollection());
 
         $this->assertContainsOnlyInstancesOf(Route::class, $router->getRouteCollection());
 
-        $this->assertEquals($route, $router->get("home"));
+        $this->assertEquals($routeHome, $router->get("home"));
+
+        $this->assertEquals($routeHome, $router->match("/"));
+        $this->assertEquals($routeArticle, $router->match("/blog/12/mon-article"));
+
+        $this->assertEquals("Hello world", $router->match("/")->call());
+
+    }
+
+    public function testIfRouteNotFoundByMatch() {
+        $router = new Router();
+        $this->expectException(RouteNotFoundException::class);
+        $router->match("/");
     }
 
     // vérifie si la route n'existe pas
-    public function testIfRouteNotFound() {
+    public function testIfRouteNotFoundByGet() {
         $router = new Router();
         $this->expectException(RouteNotFoundException::class);
         $router->get("fail");

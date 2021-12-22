@@ -2,6 +2,8 @@
 
 namespace Chloe\Routeur;
 
+use function PHPUnit\Framework\throwException;
+
 class Router {
 
     /**
@@ -10,8 +12,23 @@ class Router {
     private array $routes = [];
 
     /**
+     * @param string $path
+     * @return Route
+     */
+    public function match(string $path): Route {
+        foreach ($this->routes as $route) {
+            if ($route->test($path)) {
+                return $route;
+            }
+
+        }
+        throw new RouteNotFoundException();
+    }
+
+    /**
      * @param Route $route
      * @return $this
+     * @throws RouteAlreadyExistsException
      */
     public function add(Route $route): self {
         if ($this->has($route->getName())) {
