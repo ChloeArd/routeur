@@ -17,7 +17,7 @@ class RouterTest extends TestCase {
             return "Hello world";
         });
 
-        $routeArticle = new Route("article", "/blog/{id}/{slug}", function(string $id, string $slug) {
+        $routeArticle = new Route("article", "/blog/{id}/{slug}", function(string $slug, string $id) {
             return sprintf("%s : %s", $id, $slug);
         });
 
@@ -33,7 +33,9 @@ class RouterTest extends TestCase {
         $this->assertEquals($routeHome, $router->match("/"));
         $this->assertEquals($routeArticle, $router->match("/blog/12/mon-article"));
 
-        $this->assertEquals("Hello world", $router->match("/")->call());
+        $this->assertEquals("Hello world", $router->match("/")->call("/"));
+
+        $this->assertEquals("12 : mon-article", $router->match("/blog/12/mon-article")->call("/blog/12/mon-article"));
 
     }
 
