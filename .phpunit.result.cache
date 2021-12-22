@@ -1,0 +1,1 @@
+{"version":1,"defects":{"chloe\\routeur\\tests\\RouterTest::test":4,"Chloe\\Routeur\\Tests\\RouterTest::testIfRouteAlreadyExists":3},"times":{"chloe\\routeur\\tests\\RouterTest::test":0.004,"Chloe\\Routeur\\Tests\\RouterTest::test":0.006,"Chloe\\Routeur\\Tests\\RouterTest::testIfRouteAlreadyExists":0.002,"Chloe\\Routeur\\Tests\\RouterTest::testIfRouteNotFound":0.001}}
